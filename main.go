@@ -78,17 +78,20 @@ func messageCreate(s *discordgo.Session, m *discordgo.MessageCreate) {
 		s.ChannelMessageSend(m.ChannelID, fmt.Sprintf("%v %v", getUser(m.Author.ID), dropMessage))
 
 		return
+
 	case grabPattern.MatchString(m.Content):
 		time.Sleep(time.Minute * 30)
 		s.ChannelMessageSend(m.ChannelID, fmt.Sprintf("%v %v", getUser(m.Author.ID), grabMessage))
 
 		return
+
 	case dailyPattern.MatchString(m.Content):
 		s.ChannelMessageSend(m.ChannelID, dailyMessage1)
 		time.Sleep(time.Second * 84_600)
 		s.ChannelMessageSend(m.ChannelID, fmt.Sprintf("%v %v", getUser(m.Author.ID), dailyMessage2))
 
 		return
+
 	case purchasePattern.MatchString(m.Content):
 		s.ChannelMessageDelete(m.ChannelID, m.ID)
 		s.ChannelMessageSend(m.ChannelID, hardDontBuyMessage)
@@ -150,6 +153,7 @@ func messageCreate(s *discordgo.Session, m *discordgo.MessageCreate) {
 
 			if value2 == "" {
 				s.ChannelMessageSend(m.ChannelID, fmt.Sprintf("%v already %v hours 😏", getUser(m.Author.ID), value1))
+
 				return
 			}
 
