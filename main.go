@@ -56,6 +56,43 @@ func isValidPrefix(p string) bool {
 	return p == prefix || p == alias
 }
 
+func embedHelp() *discordgo.MessageEmbed {
+	return &discordgo.MessageEmbed{
+		Title:     "Help",
+		Thumbnail: &discordgo.MessageEmbedThumbnail{URL: "https://media3.giphy.com/media/26Ff4P2zcsiIi6fQY/giphy.gif?cid=ecf05e47ocriucm3ha0ikjwwirjxjshcdv4jwajouf0uln4t&rid=giphy.gif&ct=g"},
+		Color:     58,
+		Fields: []*discordgo.MessageEmbedField{
+			&discordgo.MessageEmbedField{
+				Name:  fmt.Sprintf("**%v status**", prefix),
+				Value: "get currently status(drop, grab, alias)",
+			},
+			&discordgo.MessageEmbedField{
+				Name:  fmt.Sprintf("**%v drop <value>**", prefix),
+				Value: "set drop status (value are 'on' or 'off)",
+			},
+			&discordgo.MessageEmbedField{
+				Name:  fmt.Sprintf("**%v grab <value>**", prefix),
+				Value: "set grab status (value are 'on' or 'off)",
+			},
+			&discordgo.MessageEmbedField{
+				Name:  fmt.Sprintf("**%v count <number> msg?** ", prefix),
+				Value: "timer (1,2,3,4,5,....) for minute",
+			},
+			&discordgo.MessageEmbedField{
+				Name:  fmt.Sprintf("**%v count <number>hr msg?** ", prefix),
+				Value: "timer (1,2,3,4,5,....) for hour",
+			},
+			&discordgo.MessageEmbedField{
+				Name:  fmt.Sprintf("**%v alias <alias>**", prefix),
+				Value: "change alias",
+			},
+		},
+		Footer: &discordgo.MessageEmbedFooter{
+			Text: "source code -> https://github.com/jungai/nonnmonn-v2",
+		},
+	}
+}
+
 func main() {
 	discord, err := discordgo.New("Bot " + os.Getenv("TOKEN"))
 
@@ -141,6 +178,11 @@ func messageCreate(s *discordgo.Session, m *discordgo.MessageCreate) {
 	}
 
 	switch command {
+	case "help":
+		s.ChannelMessageSendEmbed(m.ChannelID, embedHelp())
+
+		return
+
 	case "drop":
 	case "grab":
 		if value1 != On && value1 != Off {
@@ -172,14 +214,14 @@ func messageCreate(s *discordgo.Session, m *discordgo.MessageCreate) {
 		return
 	case "cd":
 		s.ChannelMessageSend(m.ChannelID, fmt.Sprintf("%v see ya in 30 min", getUser(m.Author.ID)))
-		time.Sleep(time.Second * 3)
+		time.Sleep(time.Minute * 30)
 		s.ChannelMessageSend(m.ChannelID, fmt.Sprintf("%v already 30 min 😏", getUser(m.Author.ID)))
 
 		return
 
 	case "cg":
 		s.ChannelMessageSend(m.ChannelID, fmt.Sprintf("%v see ya in 10 min", getUser(m.Author.ID)))
-		time.Sleep(time.Second * 2)
+		time.Sleep(time.Minute * 10)
 		s.ChannelMessageSend(m.ChannelID, fmt.Sprintf("%v already 10 min 😏", getUser(m.Author.ID)))
 
 		return
