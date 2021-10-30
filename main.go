@@ -13,13 +13,30 @@ import (
 	"github.com/bwmarrin/discordgo"
 )
 
+const (
+	prefix = "mon"
+)
+
+// enum
+const (
+	On  = "on"
+	Off = "off"
+)
+
+// state
 var (
-	prefix             string = "mon"
-	dropPattern, _            = regexp.Compile(`(^\<\@\d{18}\>) is dropping \d cards!$`)
-	grabPattern, _            = regexp.Compile(`(^\<\@\d{18}\>) took the \*\*.*\*\* card .\*!`)
-	dailyPattern, _           = regexp.Compile(`you earned a daily reward`)
-	purchasePattern, _        = regexp.Compile(`(^\<\@\d{18}\>), please follow this link to complete your purchase`)
-	checkIsDigit, _           = regexp.Compile(`^[0-9]+$`)
+	alias      = "mon"
+	dropStatus = "on"
+	grabStatus = "on"
+)
+
+// reg
+var (
+	dropPattern, _     = regexp.Compile(`(^\<\@\d{18}\>) is dropping \d cards!$`)
+	grabPattern, _     = regexp.Compile(`(^\<\@\d{18}\>) took the \*\*.*\*\* card .\*!`)
+	dailyPattern, _    = regexp.Compile(`you earned a daily reward`)
+	purchasePattern, _ = regexp.Compile(`(^\<\@\d{18}\>), please follow this link to complete your purchase`)
+	checkIsDigit, _    = regexp.Compile(`^[0-9]+$`)
 )
 
 var (
@@ -36,7 +53,7 @@ func getUser(id string) string {
 }
 
 func isValidPrefix(p string) bool {
-	return p == prefix
+	return p == prefix || p == alias
 }
 
 func main() {
@@ -73,13 +90,13 @@ func main() {
 func messageCreate(s *discordgo.Session, m *discordgo.MessageCreate) {
 	// for karuta bot here
 	switch {
-	case dropPattern.MatchString(m.Content):
+	case dropPattern.MatchString(m.Content) && dropStatus == On:
 		time.Sleep(time.Minute * 30)
 		s.ChannelMessageSend(m.ChannelID, fmt.Sprintf("%v %v", getUser(m.Author.ID), dropMessage))
 
 		return
 
-	case grabPattern.MatchString(m.Content):
+	case grabPattern.MatchString(m.Content) && grabStatus == On:
 		time.Sleep(time.Minute * 30)
 		s.ChannelMessageSend(m.ChannelID, fmt.Sprintf("%v %v", getUser(m.Author.ID), grabMessage))
 
@@ -118,12 +135,41 @@ func messageCreate(s *discordgo.Session, m *discordgo.MessageCreate) {
 
 	prefix, command, value1, value2 := monCommand[0], monCommand[1], monCommand[2], monCommand[3]
 
+	// check prefix
 	if !isValidPrefix(prefix) {
 		return
 	}
-	// check prefix
 
 	switch command {
+	case "drop":
+	case "grab":
+		if value1 != On && value1 != Off {
+			s.ChannelMessageSend(m.ChannelID, fmt.Sprintf("**%v** is not valid <on | off>", command))
+
+			return
+		}
+
+		if command == "drop" {
+			dropStatus = value1
+			s.ChannelMessageSend(m.ChannelID, fmt.Sprintf("**%v** is **%v**", command, value1))
+
+			return
+		}
+
+		if command == "grab" {
+			s.ChannelMessageSend(m.ChannelID, fmt.Sprintf("**%v** is **%v**", command, value1))
+			grabStatus = value1
+
+			return
+		}
+
+		return
+
+	case "alias":
+		alias = value1
+		s.ChannelMessageSend(m.ChannelID, fmt.Sprintf("**alias** is set to -> **%v**", value1))
+
+		return
 	case "cd":
 		s.ChannelMessageSend(m.ChannelID, fmt.Sprintf("%v see ya in 30 min", getUser(m.Author.ID)))
 		time.Sleep(time.Second * 3)
