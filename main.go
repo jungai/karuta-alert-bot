@@ -36,6 +36,7 @@ var (
 	grabPattern, _     = regexp.Compile(`(^\<\@\d{18}\>) took the \*\*.*\*\* card .\*!`)
 	dailyPattern, _    = regexp.Compile(`you earned a daily reward`)
 	purchasePattern, _ = regexp.Compile(`(^\<\@\d{18}\>), please follow this link to complete your purchase`)
+	workPattern, _     = regexp.Compile(`\*\*Your workers have finished their tasks.\*\*`)
 	checkIsDigit, _    = regexp.Compile(`^[0-9]+$`)
 )
 
@@ -46,6 +47,8 @@ var (
 	grabMessage          = "**Grab** currently available 😉"
 	dailyMessage1        = "see ya for next daily is available 🥳"
 	dailyMessage2        = "**Daily** currently available 😉"
+	workMessage1         = "I will notify you when work already avaliable 🌝"
+	workMessage2         = "**Work** currently available 🥳"
 )
 
 func getUser(id string) string {
@@ -103,6 +106,7 @@ func main() {
 	}
 
 	discord.AddHandler(messageCreate)
+	discord.AddHandler(messageUpdate)
 
 	// Identity
 	discord.Identify.Intents = discordgo.IntentsGuildMessages
@@ -154,7 +158,7 @@ func messageCreate(s *discordgo.Session, m *discordgo.MessageCreate) {
 	}
 
 	// Check Embed
-	if len(m.Embeds) != 0 {
+	if len(m.Embeds) > 0 {
 		switch {
 		case m.Embeds[0].Title == "Purchase Gems":
 			s.ChannelMessageDelete(m.ChannelID, m.ID)
@@ -269,4 +273,19 @@ func messageCreate(s *discordgo.Session, m *discordgo.MessageCreate) {
 		}
 	}
 
+}
+
+func messageUpdate(s *discordgo.Session, m *discordgo.MessageUpdate) {
+	if len(m.Embeds) > 0 {
+		switch {
+		case m.Embeds[0].Title == "Work" && workPattern.MatchString(m.Embeds[0].Description):
+			user := strings.Split(m.Embeds[0].Description, ",")
+			s.ChannelMessageSend(m.ChannelID, fmt.Sprintf("%v %v", user[0], workMessage1))
+			time.Sleep(time.Second * 42_300) // 11.45 hour
+			s.ChannelMessageSend(m.ChannelID, fmt.Sprintf("%v %v", user[0], workMessage2))
+
+			return
+		}
+
+	}
 }
