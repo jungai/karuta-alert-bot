@@ -133,13 +133,15 @@ func messageCreate(s *discordgo.Session, m *discordgo.MessageCreate) {
 	switch {
 	case dropPattern.MatchString(m.Content) && dropStatus == On:
 		time.Sleep(time.Minute * 30)
-		s.ChannelMessageSend(m.ChannelID, fmt.Sprintf("%v %v", getUser(m.Author.ID), dropMessage))
+		user := strings.Split(m.Content, " ")
+		s.ChannelMessageSend(m.ChannelID, fmt.Sprintf("%v %v", user[0], dropMessage))
 
 		return
 
 	case grabPattern.MatchString(m.Content) && grabStatus == On:
 		time.Sleep(time.Minute * 30)
-		s.ChannelMessageSend(m.ChannelID, fmt.Sprintf("%v %v", getUser(m.Author.ID), grabMessage))
+		user := strings.Split(m.Content, " ")
+		s.ChannelMessageSend(m.ChannelID, fmt.Sprintf("%v %v", user[0], grabMessage))
 
 		return
 
