@@ -189,8 +189,7 @@ func messageCreate(s *discordgo.Session, m *discordgo.MessageCreate) {
 
 		return
 
-	case "drop":
-	case "grab":
+	case "drop", "grab":
 		if value1 != On && value1 != Off {
 			s.ChannelMessageSend(m.ChannelID, fmt.Sprintf("**%v** is not valid <on | off>", command))
 
