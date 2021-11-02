@@ -148,7 +148,8 @@ func messageCreate(s *discordgo.Session, m *discordgo.MessageCreate) {
 	case dailyPattern.MatchString(m.Content):
 		s.ChannelMessageSend(m.ChannelID, dailyMessage1)
 		time.Sleep(time.Second * 84_600)
-		s.ChannelMessageSend(m.ChannelID, fmt.Sprintf("%v %v", getUser(m.Author.ID), dailyMessage2))
+		user := strings.Split(m.Content, " ")
+		s.ChannelMessageSend(m.ChannelID, fmt.Sprintf("%v %v", user[0], dailyMessage2))
 
 		return
 
