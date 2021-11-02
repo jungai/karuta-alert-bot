@@ -40,7 +40,7 @@ var (
 	checkIsDigit, _    = regexp.Compile(`^[0-9]+$`)
 )
 
-var (
+const (
 	simpleDontBuyMessage = "อย่าเติมเลยค้าบบ 😅"
 	hardDontBuyMessage   = "ก็บอกว่าอย่าเติมมม 😡"
 	dropMessage          = "**Drop** currently available 😗"
@@ -148,7 +148,7 @@ func messageCreate(s *discordgo.Session, m *discordgo.MessageCreate) {
 	case dailyPattern.MatchString(m.Content):
 		s.ChannelMessageSend(m.ChannelID, dailyMessage1)
 		time.Sleep(time.Second * 84_600)
-		user := strings.Split(m.Content, " ")
+		user := strings.Split(m.Content, ",")
 		s.ChannelMessageSend(m.ChannelID, fmt.Sprintf("%v %v", user[0], dailyMessage2))
 
 		return
