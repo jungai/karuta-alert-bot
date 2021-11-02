@@ -27,7 +27,7 @@ const (
 var (
 	alias      = "mon"
 	dropStatus = "on"
-	grabStatus = "on"
+	grabStatus = "off"
 )
 
 // reg
